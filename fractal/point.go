@@ -3,32 +3,24 @@ package fractal
 import (
 	"fmt"
 	"math"
-	"math/big"
 )
-
-var sqrt2 = new(big.Float).SetFloat64(math.Sqrt2)
-
-var square2 = big.NewFloat(4)
-var defaultMaxIterations = big.NewInt(1 << 12)
-var one = big.NewInt(1)
 
 // Point of mandelbrot
 type Point struct {
 	Z, C       *Complex
-	Iterations *big.Int
-	Max        *big.Int
+	Iterations uint64
 }
 
 // NewPoint initialize new point
 func NewPoint() *Point {
 	z := NewComplex()
 	c := NewComplex()
-	i := new(big.Int)
-	return &Point{z, c, i, defaultMaxIterations}
+	var i uint64
+	return &Point{z, c, i}
 }
 
 func (p *Point) String() string {
-	return fmt.Sprintf("%s, i=%s", p.Z, p.Iterations)
+	return fmt.Sprintf("%s + %s, i=%d", p.Z, p.C, p.Iterations)
 }
 
 // Set sets the point
@@ -39,31 +31,16 @@ func (p *Point) Set(z, c *Complex) *Point {
 	return p
 }
 
-// SetMaxIteration sets the maximum iteration
-func (p *Point) SetMaxIteration(max *big.Int) *Point {
-	p.Max = max
-
-	return p
-}
-
-// SetPrec sets the precision of the numbers
-func (p *Point) SetPrec(prec uint) *Point {
-	p.Z = p.Z.SetPrec(prec)
-	p.C = p.C.SetPrec(prec)
-
-	return p
-}
-
 // Iterate calculate one iteration
 func (p *Point) Iterate() {
 	z2 := p.Z.Square(p.Z)
 	p.Z = z2.Add(z2, p.C)
-	p.Iterations = p.Iterations.Add(p.Iterations, one)
+	p.Iterations++
 }
 
 // Calculate all iteration until break conditions are met
-func (p *Point) Calculate() *Point {
-	for !p.Exceeds() && p.Iterations.Cmp(p.Max) < 0 {
+func (p *Point) Calculate(max uint64) *Point {
+	for !p.Exceeds() && p.Iterations < max {
 		p.Iterate()
 	}
 	return p
@@ -71,13 +48,16 @@ func (p *Point) Calculate() *Point {
 
 // Exceeds checks if the point exceeds
 func (p *Point) Exceeds() bool {
-	if p.Z.Real.Cmp(sqrt2) < 0 && p.Z.Imaginary.Cmp(sqrt2) < 0 {
+	if math.Abs(p.Z.Real) < math.Sqrt2 && math.Abs(p.Z.Imaginary) < math.Sqrt2 {
 		return false
 	}
+	if p.Z.Real >= 2 || p.Z.Imaginary > 2 {
+		return true
+	}
 
-	r2 := new(big.Float).Mul(p.Z.Real, p.Z.Real)
-	i2 := new(big.Float).Mul(p.Z.Imaginary, p.Z.Imaginary)
-	d := new(big.Float).Add(r2, i2)
-
-	return d.Cmp(square2) >= 0
+	r2 := p.Z.Real * p.Z.Real
+	i2 := p.Z.Imaginary * p.Z.Imaginary
+	d := r2 + i2
+	result := 4 <= d
+	return result
 }

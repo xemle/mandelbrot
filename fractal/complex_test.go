@@ -2,7 +2,6 @@ package fractal_test
 
 import (
 	"mandelbrot/fractal"
-	"math/big"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -10,41 +9,41 @@ import (
 
 func TestComplexToString(t *testing.T) {
 	s := fractal.NewComplex()
-	assert.Equal(t, "0+0i", s.String())
+	assert.Equal(t, "0.000000+0.000000i", s.String())
 }
 
-func TestSetFloat64(t *testing.T) {
-	z := fractal.NewComplex().SetFloat64(1, 0)
-	r := new(big.Float).SetFloat64(1)
-	i := new(big.Float).SetFloat64(0)
+func TestNewComplex64(t *testing.T) {
+	z := fractal.NewComplex64(1, 0)
+	r := 1.0
+	i := 0.0
 	assert.Equal(t, r, z.Real)
 	assert.Equal(t, i, z.Imaginary)
 }
 
 func TestAdd(t *testing.T) {
-	x := fractal.NewComplex().SetFloat64(1, 0)
-	y := fractal.NewComplex().SetFloat64(0, 2)
+	x := fractal.NewComplex64(1, 0)
+	y := fractal.NewComplex64(0, 2)
 	z := fractal.NewComplex().Add(x, y)
 
-	r := new(big.Float).SetFloat64(1)
-	i := new(big.Float).SetFloat64(2)
+	r := 1.0
+	i := 2.0
 	assert.Equal(t, r, z.Real)
 	assert.Equal(t, i, z.Imaginary)
 }
 
 func TestMul(t *testing.T) {
-	x := fractal.NewComplex().SetFloat64(1, 2)
-	y := fractal.NewComplex().SetFloat64(3, -1)
+	x := fractal.NewComplex64(1, 2)
+	y := fractal.NewComplex64(3, -1)
 	z := fractal.NewComplex().Mul(x, y)
 
-	r := new(big.Float).SetFloat64(5)
-	i := new(big.Float).SetFloat64(5)
+	r := 5.0
+	i := 5.0
 	assert.Equal(t, r, z.Real)
 	assert.Equal(t, i, z.Imaginary)
 }
 
 func TestSquare(t *testing.T) {
-	x := fractal.NewComplex().SetFloat64(2, 5)
+	x := fractal.NewComplex64(2, 5)
 	square := fractal.NewComplex().Square(x)
 	expected := fractal.NewComplex().Mul(x, x)
 
