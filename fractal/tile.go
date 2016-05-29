@@ -1,5 +1,7 @@
 package fractal
 
+import "fmt"
+
 // Tile calculates a part of fractal
 type Tile struct {
 	TopLeft, BottomRight *Complex
@@ -34,4 +36,15 @@ func (t *Tile) Calculate(max uint64) *Tile {
 	}
 
 	return t
+}
+
+// Print prints the tile
+func (t *Tile) Print() {
+	for index, p := range t.Points {
+		fmt.Printf("%2d", p.Iterations)
+		fmt.Print(" ")
+		if index%t.Width == t.Width-1 {
+			fmt.Println("")
+		}
+	}
 }

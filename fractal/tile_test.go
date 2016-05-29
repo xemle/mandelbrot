@@ -1,7 +1,6 @@
 package fractal_test
 
 import (
-	"fmt"
 	"mandelbrot/fractal"
 	"testing"
 
@@ -25,11 +24,5 @@ func TestTileCalculate2(t *testing.T) {
 
 	tile.Calculate(max)
 
-	for index, p := range tile.Points {
-		fmt.Printf("%2d", p.Iterations)
-		fmt.Print(" ")
-		if index%s == s-1 {
-			fmt.Println("")
-		}
-	}
+	tile.Print()
 }
