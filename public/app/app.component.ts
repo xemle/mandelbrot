@@ -13,13 +13,17 @@ import './rxjs-operators';
   `],
   template: `<h1>Mandelbrot2Go</h1>
   <div #container clas="container">
-    <canvas #canvas [attr.width]="width" [attr.height]="height"></canvas>
+    <canvas #canvas [attr.width]="width" [attr.height]="height" (click)="zoom($event)" ></canvas>
   </div>`
 })
 
 export class AppComponent {
   @ViewChild("container") container;
   @ViewChild("canvas") canvas;
+
+  centerX:number = 0;
+  centerY:number = 0;
+  size:number = 4;
 
   top:number = 2;
   left:number = -2;
@@ -29,12 +33,16 @@ export class AppComponent {
   width: number = 450;
   height: number = 350;
   tileSize: number = 100;
-  maxIteration = 1099;
+  maxIteration = 10000;
 
   constructor(private http: Http) {
   }
 
   set(centerX, centerY, size) {
+    this.centerX = centerX;
+    this.centerY = centerY;
+    this.size = size;
+
     var d = size / Math.min(this.width, this.height);
     this.top = centerY + (this.height / 2) * d;
     this.left = centerX - (this.width / 2) * d;
@@ -49,7 +57,7 @@ export class AppComponent {
     let canvas = this.canvas.nativeElement;
     this.context = canvas.getContext("2d");
 
-    this.set(-0.981, 0.3, 0.004);
+    this.set(0, 0, 4);
     this.calculateTiles();
   }
 
@@ -95,7 +103,7 @@ export class AppComponent {
     // Fix javascript rounding errors
     x = x.toFixed(0);
     y = y.toFixed(0);
-    
+
     console.log("Got tile at x=" + x + ", y=" + y, tile);
     let imageData = this.context.getImageData(x, y, tile.width, tile.height);
 
@@ -131,7 +139,20 @@ export class AppComponent {
     return imageData;
   }
 
-   /**
+  zoom($event) {
+    console.log($event);
+    let x = $event.clientX - $event.path[0].offsetLeft;
+    let y = $event.clientY - $event.path[0].offsetTop;
+
+    let centerX = this.left + (x / this.width) * (this.right - this.left);
+    let centerY = this.top - (y / this.height) * (this.top - this.bottom);
+    let size = this.size * 0.5;
+
+    this.set(centerX, centerY, size);
+    this.calculateTiles();
+  }
+
+  /**
    * Converts an HSL color value to RGB. Conversion formula
    * adapted from http://en.wikipedia.org/wiki/HSL_color_space.
    * Assumes h, s, and l are contained in the set [0, 1] and
