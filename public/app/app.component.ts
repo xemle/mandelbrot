@@ -26,10 +26,10 @@ export class AppComponent {
   bottom:number = -2;
   right:number = 2;
 
-  width: number = 100;
-  height: number = 100;
+  width: number = 450;
+  height: number = 350;
   tileSize: number = 100;
-  maxIteration = 99;
+  maxIteration = 1099;
 
   constructor(private http: Http) {
   }
@@ -44,12 +44,12 @@ export class AppComponent {
 
   ngAfterViewInit() {
     let container = this.container.nativeElement;
-    this.width = container.offsetWidth;
-    this.height = 500;
+    //this.width = container.offsetWidth;
+    //this.height = 500;
     let canvas = this.canvas.nativeElement;
     this.context = canvas.getContext("2d");
 
-    this.set(-0.5, 0, 0.2);
+    this.set(-0.981, 0.3, 0.004);
     this.calculateTiles();
   }
 
@@ -89,15 +89,13 @@ export class AppComponent {
   }
 
   addTile(tile) {
-    let tileDx = (tile.right - tile.left) / tile.width;
-    let tileDy = (tile.top - tile.bottom) / tile.height;
+    let x = this.width * (tile.left - this.left) / (this.right - this.left);
+    let y = this.height * (this.top - tile.top) / (this.top - this.bottom);
 
-    let dx = (this.right - this.left) / this.width;
-    let dy = (this.top - this.bottom) / this.height;
-
-    let x = (tile.left - this.left) / dx;
-    let y = (this.top - tile.top) / dy;
-
+    // Fix javascript rounding errors
+    x = x.toFixed(0);
+    y = y.toFixed(0);
+    
     console.log("Got tile at x=" + x + ", y=" + y, tile);
     let imageData = this.context.getImageData(x, y, tile.width, tile.height);
 
@@ -109,7 +107,6 @@ export class AppComponent {
   drawTile(tile, imageData) {
     let len = Math.min(tile.iterations.length, imageData.data.length / 4);
     let i = 0;
-    let hue = 1 / tile.maxIteration;
     while (i < len) {
       let iteration = tile.iterations[i];
 
@@ -120,7 +117,9 @@ export class AppComponent {
 
       let rgb = [0, 0, 0];
       if (iteration < tile.maxIteration) {
-        rgb = this.hslToRgb(hue * iteration, 0.5, 0.5);
+        var log = Math.log(iteration / 4);
+        var hue = 1 / (log % 360);
+        rgb = this.hslToRgb(hue, 0.7, 0.5);
       }
       imageData.data[p] = rgb[0];
       imageData.data[p + 1] = rgb[1];
