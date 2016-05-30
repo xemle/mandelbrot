@@ -33,7 +33,7 @@ export class AppComponent {
   width: number = 450;
   height: number = 350;
   tileSize: number = 100;
-  maxIteration = 10000;
+  maxIteration = 100000;
 
   constructor(private http: Http) {
   }
@@ -125,9 +125,10 @@ export class AppComponent {
 
       let rgb = [0, 0, 0];
       if (iteration < tile.maxIteration) {
-        var log = Math.log(iteration / 4);
-        var hue = 1 / (log % 360);
-        rgb = this.hslToRgb(hue, 0.7, 0.5);
+        var hue = (iteration % 360) / 360;
+        var saturation = 0.6 + 0.4 * Math.sin((iteration / 500));
+        var lightness = 0.5 + 0.2 * Math.cos((iteration / 1700));
+        rgb = this.hslToRgb(hue, saturation, 0.5);
       }
       imageData.data[p] = rgb[0];
       imageData.data[p + 1] = rgb[1];
