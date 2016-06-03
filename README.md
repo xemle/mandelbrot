@@ -6,7 +6,7 @@ in golang.
 
     $ mkdir -p mandelbrot/src
     $ export GOPATH=`pwd`/mandelbrot
-    $ git clone git@github.com:xemle/mandelbrot-browser.git mandelbrot/src/mandelbrot
+    $ git clone git@github.com:xemle/mandelbrot.git mandelbrot/src/mandelbrot
     $ cd mandelbrot/src/mandelbrot/public
     $ npm install
     $ npm tsc
